@@ -1,68 +1,154 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <title>حسابات الدكان</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background: #fefbf3;
-            color: #333;
-            padding: 20px;
-            direction: rtl;
-        }
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            padding: 12px;
-            border: 1px solid #ccc;
-            text-align: center;
-        }
-        th {
-            background-color: #f8c291;
-        }
-        tr.low-balance {
-            background-color: #f9e6e6;
-            color: red;
-        }
-        .floating-btn {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background-color: #27ae60;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 50px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            cursor: pointer;
-            font-size: 16px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>حسابات الدكان - حتى 100 زبون</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #e3f2fd, #bbdefb);
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #0d47a1;
+    }
+    .search-box {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .search-box input {
+      padding: 10px;
+      width: 300px;
+      font-size: 16px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #e1f5fe;
+    }
+    .low-balance {
+      background-color: #ffe5e5 !important;
+    }
+    .history {
+      font-size: 12px;
+      color: #666;
+      margin-top: 4px;
+    }
+    .floating-btn {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background-color: #2196F3;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 15px 25px;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+  </style>
 </head>
 <body>
-    <h1>حسابات الدكان</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>الاسم</th>
-                <th>الرصيد الحالي (ج)</th>
-                <th>آخر تحديث</th>
-            </tr>
-        </thead>
-        <tbody id="customer-table">
-            <!-- الصفوف ستُضاف هنا تلقائياً -->
-        </tbody>
-    </table>
 
-    <div class="floating-btn">اكمال</div>
+<h1>حسابات الدكان - حتى 100 زبون</h1>
+<div class="search-box">
+  <input type="text" id="searchInput" placeholder="ابحث باسم الزبون...">
+</div>
+
+<table id="customersTable">
+  <thead>
+    <tr>
+      <th>الرقم</th>
+      <th>اسم الزبون</th>
+      <th>أضف مقدم</th>
+      <th>الطلب (خصم)</th>
+      <th>المتبقي</th>
+      <th>السجل</th>
+    </tr>
+  </thead>
+  <tbody id="tableBody"></tbody>
+</table>
+
+<button class="floating-btn" onclick="renderTable()">اكمال</button>
+
+<script>
+  const tableBody = document.getElementById("tableBody");
+
+  const data = Array.from({ length: 100 }, (_, i) => ({
+    id: i + 1,
+    name: '',
+    paid: 0,
+    remaining: 0,
+    history: []
+  }));
+
+  function getCurrentTimestamp() {
+    const now = new Date();
+    return now.toLocaleString();
+  }
+
+  function renderTable(filter = '') {
+    tableBody.innerHTML = '';
+    data.forEach((item, index) => {
+      if (filter && !item.name.includes(filter)) return;
+
+      const tr = document.createElement("tr");
+      if (item.remaining <= 2000) tr.classList.add("low-balance");
+
+      tr.innerHTML = `
+        <td>${item.id}</td>
+        <td><input type="text" value="${item.name}" onchange="updateName(${index}, this.value)"></td>
+        <td><input type="number" placeholder="جنيه" onchange="addPaid(${index}, this.value)"></td>
+        <td><input type="number" placeholder="جنيه" onchange="subtractAmount(${index}, this.value)"></td>
+        <td>${item.remaining}</td>
+        <td><div class="history">${item.history.map(h => `<div>${h}</div>`).join('')}</div></td>
+      `;
+      tableBody.appendChild(tr);
+    });
+  }
+
+  function updateName(index, value) {
+    data[index].name = value;
+  }
+
+  function addPaid(index, amount) {
+    amount = parseFloat(amount);
+    if (!isNaN(amount) && amount > 0) {
+      data[index].paid += amount;
+      data[index].remaining += amount;
+      data[index].history.push(`+${amount} في ${getCurrentTimestamp()}`);
+      renderTable(document.getElementById('searchInput').value);
+    }
+  }
+
+  function subtractAmount(index, amount) {
+    amount = parseFloat(amount);
+    if (!isNaN(amount) && amount > 0 && data[index].remaining >= amount) {
+      data[index].remaining -= amount;
+      data[index].history.push(`-${amount} في ${getCurrentTimestamp()}`);
+      renderTable(document.getElementById('searchInput').value);
+    }
+  }
+
+  document.getElementById("searchInput").addEventListener("input", function() {
+    renderTable(this.value);
+  });
+
+  renderTable();
+</script>
+
 </body>
 </html>
