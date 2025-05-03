@@ -1,0 +1,68 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>حسابات الدكان</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #fefbf3;
+            color: #333;
+            padding: 20px;
+            direction: rtl;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+        th {
+            background-color: #f8c291;
+        }
+        tr.low-balance {
+            background-color: #f9e6e6;
+            color: red;
+        }
+        .floating-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: #27ae60;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>حسابات الدكان</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>الاسم</th>
+                <th>الرصيد الحالي (ج)</th>
+                <th>آخر تحديث</th>
+            </tr>
+        </thead>
+        <tbody id="customer-table">
+            <!-- الصفوف ستُضاف هنا تلقائياً -->
+        </tbody>
+    </table>
+
+    <div class="floating-btn">اكمال</div>
+</body>
+</html>
